@@ -1,0 +1,42 @@
+# {{.Name}}
+
+Service được scaffold bằng [common-go]({{`https`}}://{{.CommonModule}}).
+
+## Chạy
+
+```bash
+go get {{.CommonModule}}@latest
+go mod tidy
+go run .
+```
+
+Endpoint có sẵn (do common-go tự gắn + route mẫu):
+
+```bash
+curl localhost:8080/healthz      # liveness
+curl localhost:8080/readyz       # readiness (chạy mọi health.Checker)
+curl localhost:8080/info         # build info
+curl localhost:8080/api/v1/ping  # route nghiệp vụ mẫu
+```
+
+## Cấu hình
+
+Sửa `config.yaml`, hoặc override bằng env (prefix `APP_`, nested bằng `__`):
+
+```bash
+APP_SERVER__PORT=9090 APP_LOG__LEVEL=debug go run .
+```
+
+## Cấu trúc
+
+```
+.
+├── main.go              # wiring fx: foundation.Core() + WithHTTP()...
+├── config.yaml          # cấu hình mặc định
+└── internal/
+    ├── routes.go        # gắn route lên *gin.Engine (fx.Invoke)
+    └── handler/         # HTTP handler
+```
+
+Thêm capability bằng cách thêm `foundation.With*()` vào `main.go` và provide
+repository/service của bạn qua `fx.Provide`.

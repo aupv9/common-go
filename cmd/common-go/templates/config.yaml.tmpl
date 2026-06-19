@@ -1,0 +1,50 @@
+# Cấu hình {{.Name}}. Env override theo prefix APP_ và "__" cho nested:
+#   APP_SERVER__PORT=9090  ->  server.port
+#   APP_LOG__LEVEL=debug   ->  log.level
+app:
+  name: {{.Name}}
+  env: local
+
+log:
+  level: info
+  format: json
+
+server:
+  host: 0.0.0.0
+  port: 8080
+  read_timeout: 15s
+  write_timeout: 15s
+  shutdown_timeout: 10s
+{{- if .Postgres}}
+
+database:
+  host: localhost
+  port: 5432
+  user: app
+  password: app
+  name: {{.Name}}
+  ssl_mode: disable
+  max_conns: 10
+  min_conns: 2
+{{- end}}
+{{- if .Cache}}
+
+cache:
+  addrs:
+    - localhost:6379
+  pool_size: 10
+{{- end}}
+{{- if .GRPC}}
+
+grpc:
+  port: 9090
+  reflection: true
+{{- end}}
+{{- if .EventBus}}
+
+eventbus:
+  brokers:
+    - localhost:9092
+  group_id: {{.Name}}
+  dlq_enabled: true
+{{- end}}

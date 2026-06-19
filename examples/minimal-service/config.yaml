@@ -1,0 +1,17 @@
+# Cấu hình minimal-service. Env override theo prefix APP_ và "__" cho nested:
+#   APP_SERVER__PORT=9090  ->  server.port
+#   APP_LOG__LEVEL=debug   ->  log.level
+app:
+  name: minimal-service
+  env: local
+
+log:
+  level: info
+  format: json
+
+server:
+  host: 0.0.0.0
+  port: 8080
+  read_timeout: 15s
+  write_timeout: 15s
+  shutdown_timeout: 10s

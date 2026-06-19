@@ -1,0 +1,26 @@
+// Package handler chứa HTTP handler cho {{.Name}}.
+package handler
+
+import (
+	"log/slog"
+
+	"{{.CommonModule}}/response"
+	"github.com/gin-gonic/gin"
+)
+
+// Handler nhóm các endpoint nghiệp vụ. Dependency (logger, service, repo…)
+// được fx inject qua New.
+type Handler struct {
+	log *slog.Logger
+}
+
+// New tạo Handler.
+func New(log *slog.Logger) *Handler {
+	return &Handler{log: log}
+}
+
+// Ping trả về một response envelope mẫu.
+func (h *Handler) Ping(c *gin.Context) {
+	h.log.InfoContext(c.Request.Context(), "ping called")
+	response.OK(c.Writer, c.Request, gin.H{"message": "pong"})
+}

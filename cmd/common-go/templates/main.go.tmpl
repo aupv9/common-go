@@ -1,0 +1,35 @@
+// Command {{.Name}} là service được scaffold bằng common-go.
+//
+// Toàn bộ wiring nằm trong main(): foundation.Core() cấp config/logger/
+// observability/health; foundation.WithHTTP() cấp gin engine + middleware
+// chuẩn + health endpoint + graceful shutdown.
+package main
+
+import (
+	"{{.Module}}/internal"
+	"{{.Module}}/internal/handler"
+	"{{.CommonModule}}/foundation"
+	"go.uber.org/fx"
+)
+
+func main() {
+	fx.New(
+		foundation.Core(),     // config + logger + observability + health
+		foundation.WithHTTP(), // gin engine + middleware chuẩn + health endpoint
+{{- if .Postgres}}
+		foundation.WithPostgres(), // *pgxpool.Pool + migration + health checker
+{{- end}}
+{{- if .Cache}}
+		foundation.WithCache(), // redis.UniversalClient + health checker
+{{- end}}
+{{- if .GRPC}}
+		foundation.WithGRPC(), // grpc.Server + interceptor + health + reflection
+{{- end}}
+{{- if .EventBus}}
+		foundation.WithEventBus(), // Kafka publisher/subscriber + DLQ + trace
+{{- end}}
+
+		fx.Provide(handler.New),
+		fx.Invoke(internal.Register), // gắn route nghiệp vụ
+	).Run()
+}

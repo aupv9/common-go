@@ -1,0 +1,16 @@
+// Package internal nối route cho {{.Name}}.
+package internal
+
+import (
+	"{{.Module}}/internal/handler"
+	"github.com/gin-gonic/gin"
+)
+
+// Register gắn route nghiệp vụ vào engine. Health endpoint (/healthz, /readyz,
+// /info) đã được foundation.WithHTTP() tự gắn.
+//
+// Hàm này được gọi qua fx.Invoke — *gin.Engine và *handler.Handler tự inject.
+func Register(e *gin.Engine, h *handler.Handler) {
+	v1 := e.Group("/api/v1")
+	v1.GET("/ping", h.Ping)
+}
