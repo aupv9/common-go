@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"time"
 
+	promclient "github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
@@ -32,13 +33,20 @@ type Config struct {
 	ServiceVersion string
 	Env            string
 	Headers        map[string]string // header gửi kèm OTLP (vd Authorization)
-	MetricInterval time.Duration     // chu kỳ export metric (0 = mặc định 15s)
+	MetricInterval time.Duration     // chu kỳ export metric (0 = mặc định 15s; chỉ dùng khi exporter otlp)
+	// MetricsExporter: "otlp" (mặc định, push) | "prometheus" (expose /metrics
+	// để scrape) | "none" (tắt metrics). Rỗng = "otlp". Traces không bị ảnh hưởng.
+	MetricsExporter string
 }
 
 // Provider gom các thành phần OTel đã khởi tạo và hàm shutdown để flush.
 type Provider struct {
 	cfg         Config
 	shutdownFns []func(context.Context) error
+	// promRegistry != nil khi MetricsExporter="prometheus": registry client_golang
+	// mà OTel metrics ghi vào, phục vụ qua MetricsHandler và mở cho service đăng ký
+	// thêm collector qua PrometheusRegisterer.
+	promRegistry *promclient.Registry
 }
 
 // New khởi tạo OTel theo cfg. Luôn cài propagator W3C (TraceContext + Baggage)
