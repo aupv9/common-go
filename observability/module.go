@@ -23,16 +23,17 @@ func newFromConfig(cfg *config.AppConfig) (*Provider, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	return New(ctx, Config{
-		Enabled:        cfg.Otel.Enabled,
-		Endpoint:       cfg.Otel.Endpoint,
-		Protocol:       cfg.Otel.Protocol,
-		Insecure:       cfg.Otel.Insecure,
-		SampleRatio:    cfg.Otel.SampleRatio,
-		ServiceName:    cfg.App.Name,
-		ServiceVersion: cfg.Otel.Version,
-		Env:            cfg.App.Env,
-		Headers:        cfg.Otel.Headers,
-		MetricInterval: cfg.Otel.MetricInterval,
+		Enabled:         cfg.Otel.Enabled,
+		Endpoint:        cfg.Otel.Endpoint,
+		Protocol:        cfg.Otel.Protocol,
+		Insecure:        cfg.Otel.Insecure,
+		SampleRatio:     cfg.Otel.SampleRatio,
+		ServiceName:     cfg.App.Name,
+		ServiceVersion:  cfg.Otel.Version,
+		Env:             cfg.App.Env,
+		Headers:         cfg.Otel.Headers,
+		MetricInterval:  cfg.Otel.MetricInterval,
+		MetricsExporter: cfg.Otel.MetricsExporter,
 	})
 }
 

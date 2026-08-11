@@ -116,7 +116,11 @@ type OtelSection struct {
 	SampleRatio    float64           `koanf:"sample_ratio" validate:"min=0,max=1"` // tỉ lệ sample trace (0..1)
 	Version        string            `koanf:"version"`                             // service.version trong resource
 	Headers        map[string]string `koanf:"headers"`                             // header gửi kèm OTLP (vd Authorization cho SaaS backend)
-	MetricInterval time.Duration     `koanf:"metric_interval"`                     // chu kỳ export metric (mặc định 15s)
+	MetricInterval time.Duration     `koanf:"metric_interval"`                     // chu kỳ export metric (mặc định 15s, chỉ dùng cho exporter otlp)
+	// MetricsExporter chọn nơi metrics đi: "otlp" (mặc định, push tới Endpoint) |
+	// "prometheus" (expose /metrics để scrape, KHÔNG push) | "none" (tắt metrics,
+	// vẫn giữ traces). Traces luôn theo Endpoint/Protocol bất kể giá trị này.
+	MetricsExporter string `koanf:"metrics_exporter" validate:"omitempty,oneof=otlp prometheus none"`
 }
 
 // DatabaseSection: cấu hình Postgres (pgxpool). DSN nếu set sẽ override các
@@ -199,11 +203,12 @@ func DefaultAppConfig() *AppConfig {
 			ShutdownTimeout: 10 * time.Second,
 		},
 		Otel: OtelSection{
-			Enabled:     false,
-			Endpoint:    "localhost:4317",
-			Protocol:    "grpc",
-			Insecure:    true,
-			SampleRatio: 1.0,
+			Enabled:         false,
+			Endpoint:        "localhost:4317",
+			Protocol:        "grpc",
+			Insecure:        true,
+			SampleRatio:     1.0,
+			MetricsExporter: "otlp",
 		},
 		Database: DatabaseSection{
 			Host:            "localhost",

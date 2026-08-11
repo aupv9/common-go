@@ -5,6 +5,9 @@ Tất cả thay đổi đáng chú ý của `common-go` được ghi tại đây
 
 ## [Unreleased]
 
+### Added (observability — metrics exporter)
+- `observability`: **Prometheus metrics exporter** — `Otel.MetricsExporter` (`APP_OTEL__METRICS_EXPORTER`) chọn `otlp` (mặc định, giữ nguyên push tới `Endpoint`) | `prometheus` (expose registry qua `Provider.MetricsHandler()` để Prometheus/VictoriaMetrics **scrape**, KHÔNG push) | `none` (tắt metrics, traces vẫn chạy). `Provider.PrometheusRegisterer()` mở registry để service đăng ký thêm collector (vd metric hand-rolled) vào cùng `/metrics`. Non-breaking (mặc định `otlp`). Deps mới chỉ kéo khi build: `otel/exporters/prometheus`, `prometheus/client_golang`.
+
 ### Changed (open source — đợt 6)
 - **BREAKING — đổi module path:** module path cũ (private) → `github.com/aupv9/common-go`. Service consumer cập nhật import + `go.mod`; không còn cần `GOPRIVATE`.
 - **License:** thêm `LICENSE` (MIT) — thư viện trở thành mã nguồn mở.
